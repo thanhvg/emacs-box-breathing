@@ -1,0 +1,7 @@
+:PROPERTIES:
+:CATEGORY: emacs-box-breathing
+:END:
+
+* TODO show status
+* can customize the grid size
+
