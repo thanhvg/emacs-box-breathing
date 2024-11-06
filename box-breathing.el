@@ -52,6 +52,22 @@
                                      (1 . 0)
                                      (0 . 0)))
 
+(cl-defstruct (box-breathing-unit
+               (:constructor box-breathing-unit-create)
+               (:copier nil))
+  "Comment data structure."
+  (x nil
+         :type integer
+         :documentation "x column")
+  (y nil
+           :type integer
+           :documentation "y row")
+  (stage nil
+          :type string
+          :documentation "stage."))
+
+
+
 (defvar box-breathing--loop-0
   '((box-breathing--inhale . "inhale")
     (box-breathing--hold-inhale . "hold")
@@ -60,18 +76,28 @@
 
 
 (defvar box-breathing--loop
-  (append box-breathing--inhale
-          box-breathing--hold-inhale 
-    box-breathing--exhale 
-    box-breathing--hold-exhale))
+  (append (mapcar (lambda (it) (box-breathing-unit-create :x (car it) :y (cdr it) :stage "inhale")) box-breathing--inhale)
+          (mapcar (lambda (it) (box-breathing-unit-create :x (car it) :y (cdr it) :stage " hold")) box-breathing--hold-inhale)
+          (mapcar (lambda (it) (box-breathing-unit-create :x (car it) :y (cdr it) :stage "exhale")) box-breathing--exhale)
+          (mapcar (lambda (it) (box-breathing-unit-create :x (car it) :y (cdr it) :stage " hold")) box-breathing--hold-exhale)))
 
+
+;; (defun box-breathing--draw-grid ()
+;;   (erase-buffer)
+;;   (dotimes (_ box-breathing-grid-size)
+;;     (dotimes (_ box-breathing-grid-size)
+;;       (insert ". "))
+;;     (insert "\n")))
 
 (defun box-breathing--draw-grid ()
   (erase-buffer)
-  (dotimes (_ box-breathing-grid-size)
-    (dotimes (_ box-breathing-grid-size)
-      (insert ". "))
-    (insert "\n")))
+  (insert
+". . . . .
+.       . 
+.       . 
+.       . 
+. . . . . 
+"))
 
 (defun box-breathing--draw-pointer (i j)
   (goto-char (point-min))
@@ -81,30 +107,33 @@
   (insert "o")
   (backward-char 1))
 
+(defun box-breathing--draw-pointer-and-stage (unit)
+  (goto-char (point-max))
+  (newline)
+  (insert (box-breathing-unit-stage unit))
+  (box-breathing--draw-pointer (box-breathing-unit-x unit)
+                               (box-breathing-unit-y unit)))
 
 (defun box-breathing-exercise ()
   "Start the box breathing exercise."
   (interactive)
   (switch-to-buffer box-breathing-buffer)
   (buffer-disable-undo (current-buffer))
-  (let* ((i 0)
-        (j 0)
-        (current-pointer (car box-breathing--loop))
-        (next-phase-loop (cdr box-breathing--loop))
-        )
+  (let* ((current-unit (car box-breathing--loop))
+         (next-phase-loop (cdr box-breathing--loop)))
 
     (box-breathing--draw-grid)
-    (box-breathing--draw-pointer (car current-pointer) (cdr current-pointer))
+    (box-breathing--draw-pointer-and-stage current-unit)
     (while (sit-for 1)
       (if next-phase-loop
           (progn
-            (setq current-pointer (car next-phase-loop))
+            (setq current-unit (car next-phase-loop))
             (setq next-phase-loop (cdr next-phase-loop)))
-        (setq current-pointer (car box-breathing--loop))
+        (setq current-unit (car box-breathing--loop))
         (setq next-phase-loop (cdr box-breathing--loop)))
 
       (box-breathing--draw-grid)
-      (box-breathing--draw-pointer (car current-pointer) (cdr current-pointer)))))
+      (box-breathing--draw-pointer-and-stage current-unit))))
 
 
 (provide 'box-breathing)
