@@ -76,10 +76,10 @@
 
 
 (defvar box-breathing--loop
-  (append (mapcar (lambda (it) (box-breathing-unit-create :x (car it) :y (cdr it) :stage "inhale")) box-breathing--inhale)
-          (mapcar (lambda (it) (box-breathing-unit-create :x (car it) :y (cdr it) :stage " hold")) box-breathing--hold-inhale)
-          (mapcar (lambda (it) (box-breathing-unit-create :x (car it) :y (cdr it) :stage "exhale")) box-breathing--exhale)
-          (mapcar (lambda (it) (box-breathing-unit-create :x (car it) :y (cdr it) :stage " hold")) box-breathing--hold-exhale)))
+  (append (mapcar (lambda (it) (box-breathing-unit-create :x (car it) :y (cdr it) :stage " inhale")) box-breathing--inhale)
+          (mapcar (lambda (it) (box-breathing-unit-create :x (car it) :y (cdr it) :stage "  hold")) box-breathing--hold-inhale)
+          (mapcar (lambda (it) (box-breathing-unit-create :x (car it) :y (cdr it) :stage " exhale")) box-breathing--exhale)
+          (mapcar (lambda (it) (box-breathing-unit-create :x (car it) :y (cdr it) :stage "  hold")) box-breathing--hold-exhale)))
 
 
 ;; (defun box-breathing--draw-grid ()
@@ -119,6 +119,9 @@
   (interactive)
   (switch-to-buffer box-breathing-buffer)
   (buffer-disable-undo (current-buffer))
+  ;; https://github.com/emacs-evil/evil/issues/592
+  (setq-local evil-normal-state-cursor '(bar . 0))
+  (setq-local cursor-type nil)
   (let* ((current-unit (car box-breathing--loop))
          (next-phase-loop (cdr box-breathing--loop)))
 
