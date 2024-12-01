@@ -113,7 +113,7 @@
   (insert (box-breathing-unit-stage unit))
   (box-breathing--draw-pointer (box-breathing-unit-x unit)
                                (box-breathing-unit-y unit)))
-
+;;;###autoload
 (defun box-breathing-exercise ()
   "Start the box breathing exercise."
   (interactive)
